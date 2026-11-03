@@ -6,7 +6,7 @@ import { MessageSquareHeart, Heart, Send, Sparkles, Plus } from 'lucide-react';
 
 const PASTEL_COLORS = ['#FFE4EC', '#FFF0F5', '#FFC2D6', '#FFF8FA', '#FFFFFF'];
 const AVATAR_OPTIONS = ['💖', '🍕', '🌸', '👑', '🎂', '🧁', '✨', '🥺', '🤗'];
-const STORAGE_KEY = 'vishwa_birthday_wishes_v1';
+const STORAGE_KEY = 'vishwa_birthday_wishes_v3';
 
 export default function WishesWall() {
   const [wishes, setWishes] = useState([]);
@@ -23,11 +23,20 @@ export default function WishesWall() {
   // Load wishes from localStorage or fall back to default pre-seeded wishes
   useEffect(() => {
     try {
+      // Clean up old keys if present
+      localStorage.removeItem('vishwa_birthday_wishes_v1');
+      localStorage.removeItem('vishwa_birthday_wishes_v2');
+
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setWishes(parsed);
+          // Filter out any unwanted card ids or names
+          const filtered = parsed.filter(
+            (w) => w.id !== 'wish-3' && w.id !== 'wish-4' && w.name !== 'Aarav & Team' && w.name !== 'Riya'
+          );
+          setWishes(filtered);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
           setLoading(false);
           return;
         }

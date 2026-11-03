@@ -1,11 +1,27 @@
 import { useState, useRef, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, Sparkles } from '@react-three/drei';
+import { Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
 import { sound } from '../../utils/audio';
 import { triggerGrandFireworks, triggerHeartBurst } from '../../utils/confetti';
 import { useMicBlow } from '../../hooks/useMicBlow';
-import { Mic, MicOff, Wind, Sparkles as SparklesIcon, RotateCcw } from 'lucide-react';
+import { Mic, Wind, Sparkles as SparklesIcon, RotateCcw } from 'lucide-react';
+import RealisticCakeView from './RealisticCakeView';
+import CanvasErrorBoundary from '../common/CanvasErrorBoundary';
+
+// Helper to check WebGL availability
+function checkWebGLSupport() {
+  if (typeof window === 'undefined') return true;
+  try {
+    const canvas = document.createElement('canvas');
+    return !!(
+      window.WebGLRenderingContext &&
+      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
+    );
+  } catch (e) {
+    return false;
+  }
+}
 
 // 3D Cake with dynamic candle flame
 function InteractiveCakeModel({ isLit }) {
@@ -116,6 +132,15 @@ function InteractiveCakeModel({ isLit }) {
 export default function CakeBlowSection() {
   const [isLit, setIsLit] = useState(true);
   const [hasBlown, setHasBlown] = useState(false);
+  const [webGlSupported] = useState(() => checkWebGLSupport());
+  const [webGlFailed, setWebGlFailed] = useState(false);
+  const [viewMode, setViewMode] = useState(() => {
+    // Default to 'realistic' on narrow screens or if WebGL is unavailable to prevent mobile context crash
+    if (typeof window !== 'undefined' && (window.innerWidth < 768 || !checkWebGLSupport())) {
+      return 'realistic';
+    }
+    return '3d';
+  });
 
   const handleBlowOut = () => {
     if (!isLit) return;
@@ -137,6 +162,8 @@ export default function CakeBlowSection() {
   const { isListening, micSupported, errorMsg, startListening, stopListening } =
     useMicBlow(handleBlowOut);
 
+  const show3D = viewMode === '3d' && webGlSupported && !webGlFailed;
+
   return (
     <section id="cake" className="relative w-full py-24 bg-gradient-to-b from-vishwa-blush/40 via-vishwa-cream to-white overflow-hidden text-center">
       {/* Background Glow */}
@@ -151,28 +178,72 @@ export default function CakeBlowSection() {
         <h2 className="font-serif text-3xl sm:text-5xl font-black text-vishwa-deeprose tracking-tight mb-3">
           Blow The Candles, Vishu! 🎂✨
         </h2>
-        <p className="font-sans text-sm sm:text-base text-vishwa-deeprose/80 max-w-md mx-auto mb-6">
+        <p className="font-sans text-sm sm:text-base text-vishwa-deeprose/80 max-w-md mx-auto mb-4">
           {hasBlown
             ? "Your wish is released into the universe! May all your dreams come true! 💖"
             : "Use your microphone to blow into your phone/mic, or click the blow button!"}
         </p>
 
-        {/* 3D Cake Canvas */}
-        <div className="relative w-full h-[380px] sm:h-[440px] my-4 select-none">
-          <Canvas
-            camera={{ position: [0, 1.2, 3.8], fov: 45 }}
-            dpr={[1, 2]}
-            gl={{ antialias: true, alpha: true }}
-          >
-            <ambientLight intensity={0.8} />
-            <directionalLight position={[4, 6, 4]} intensity={1.2} />
-            <InteractiveCakeModel isLit={isLit} />
-            <Sparkles count={40} scale={6} size={2} opacity={0.4} color="#FF8FB1" />
-          </Canvas>
+        {/* View Mode Switcher (Allows switching between 3D and Ultra-Realistic Cake) */}
+        {webGlSupported && !webGlFailed && (
+          <div className="inline-flex items-center gap-1.5 p-1 rounded-full bg-white/80 border border-pink-200/70 shadow-sm backdrop-blur-md mb-2">
+            <button
+              type="button"
+              onClick={() => setViewMode('3d')}
+              className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                viewMode === '3d'
+                  ? 'bg-gradient-to-r from-vishwa-rose to-vishwa-hotpink text-white shadow-sm'
+                  : 'text-vishwa-deeprose/70 hover:text-vishwa-deeprose'
+              }`}
+            >
+              ✨ 3D Mode
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('realistic')}
+              className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                viewMode === 'realistic'
+                  ? 'bg-gradient-to-r from-vishwa-rose to-vishwa-hotpink text-white shadow-sm'
+                  : 'text-vishwa-deeprose/70 hover:text-vishwa-deeprose'
+              }`}
+            >
+              🎂 Ultra-Realistic
+            </button>
+          </div>
+        )}
+
+        {/* Cake Container */}
+        <div className="relative w-full h-[380px] sm:h-[440px] my-2 select-none flex items-center justify-center">
+          {show3D ? (
+            <CanvasErrorBoundary
+              fallback={<RealisticCakeView isLit={isLit} onBlow={handleBlowOut} />}
+            >
+              <Canvas
+                camera={{ position: [0, 1.2, 3.8], fov: 45 }}
+                dpr={[1, 1.5]}
+                gl={{ antialias: false, alpha: true, powerPreference: 'default' }}
+                onCreated={({ gl }) => {
+                  gl.domElement.addEventListener('webglcontextlost', (e) => {
+                    e.preventDefault();
+                    console.warn('WebGL context lost in Cake section, falling back to realistic cake');
+                    setWebGlFailed(true);
+                    setViewMode('realistic');
+                  });
+                }}
+              >
+                <ambientLight intensity={0.9} />
+                <directionalLight position={[4, 6, 4]} intensity={1.2} />
+                <InteractiveCakeModel isLit={isLit} />
+                <Sparkles count={35} scale={6} size={2} opacity={0.4} color="#FF8FB1" />
+              </Canvas>
+            </CanvasErrorBoundary>
+          ) : (
+            <RealisticCakeView isLit={isLit} onBlow={handleBlowOut} />
+          )}
         </div>
 
         {/* Action Controls */}
-        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-4">
+        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-2">
           {isLit ? (
             <>
               {/* Manual Tap Fallback */}

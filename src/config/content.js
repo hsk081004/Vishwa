@@ -531,26 +531,6 @@ export const CONTENT = {
       color: "#FFF0F5",
       likes: 19,
       timestamp: "2026-11-07T00:15:00Z"
-    },
-    {
-      id: "wish-3",
-      name: "Aarav & Team",
-      relation: "Forever Gang 🌸",
-      message: "Happiest Birthday Expression Queen! 🥺🤗 You bring so much sunshine, laughter, and drama into all our lives. Stay pure, stay cute, and eat lots of cake today!",
-      avatar: "✨",
-      color: "#FFC2D6",
-      likes: 16,
-      timestamp: "2026-11-07T00:30:00Z"
-    },
-    {
-      id: "wish-4",
-      name: "Riya",
-      relation: "Bestie 🎀",
-      message: "Vishu babeeeee! Happy 7th November! May your year be as sweet as cupcakes and as vibrant as your smile. We need a massive party treat soon! 🧁💖",
-      avatar: "🎀",
-      color: "#FFE4EC",
-      likes: 13,
-      timestamp: "2026-11-07T01:00:00Z"
     }
   ]
 };

@@ -217,16 +217,30 @@ function FoodieGalaxy() {
   );
 }
 
+import CanvasErrorBoundary from '../common/CanvasErrorBoundary';
+
 export default function FoodieScene() {
+  const fallback = (
+    <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-vishwa-babypink/25 rounded-full blur-3xl" />
+      <div className="absolute top-1/4 left-10 text-4xl animate-float opacity-70">🍕</div>
+      <div className="absolute top-1/3 right-10 text-4xl animate-float-delayed opacity-70">🧁</div>
+      <div className="absolute bottom-24 left-16 text-3xl animate-float opacity-60">🍩</div>
+      <div className="absolute bottom-32 right-16 text-3xl animate-float-delayed opacity-60">🍔</div>
+    </div>
+  );
+
   return (
     <div className="absolute inset-0 pointer-events-none z-0">
-      <Canvas
-        camera={{ position: [0, 0, 6.5], fov: 44 }}
-        dpr={[1, 2]}
-        gl={{ antialias: true, alpha: true }}
-      >
-        <FoodieGalaxy />
-      </Canvas>
+      <CanvasErrorBoundary fallback={fallback}>
+        <Canvas
+          camera={{ position: [0, 0, 6.5], fov: 44 }}
+          dpr={[1, 1.5]}
+          gl={{ antialias: false, alpha: true, powerPreference: 'low-power' }}
+        >
+          <FoodieGalaxy />
+        </Canvas>
+      </CanvasErrorBoundary>
     </div>
   );
 }
