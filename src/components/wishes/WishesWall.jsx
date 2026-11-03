@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { sound } from '../../utils/audio';
 import { triggerConfettiBurst, triggerHeartBurst } from '../../utils/confetti';
+import { CONTENT } from '../../config/content';
 import { MessageSquareHeart, Heart, Send, Sparkles, Plus } from 'lucide-react';
 
 const PASTEL_COLORS = ['#FFE4EC', '#FFF0F5', '#FFC2D6', '#FFF8FA', '#FFFFFF'];
 const AVATAR_OPTIONS = ['💖', '🍕', '🌸', '👑', '🎂', '🧁', '✨', '🥺', '🤗'];
+const STORAGE_KEY = 'vishwa_birthday_wishes_v1';
 
 export default function WishesWall() {
   const [wishes, setWishes] = useState([]);
@@ -18,27 +20,32 @@ export default function WishesWall() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  // Fetch wishes from Express API
-  const fetchWishes = async () => {
+  // Load wishes from localStorage or fall back to default pre-seeded wishes
+  useEffect(() => {
     try {
-      const res = await fetch('/api/wishes');
-      if (res.ok) {
-        const data = await res.json();
-        setWishes(data.data || []);
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setWishes(parsed);
+          setLoading(false);
+          return;
+        }
       }
+      // If nothing saved, initialize with pre-seeded wishes
+      const initial = CONTENT.initialWishes || [];
+      setWishes(initial);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
     } catch (err) {
-      console.warn('Could not load wishes from API, using defaults:', err);
+      console.warn('Could not read from localStorage, using defaults:', err);
+      setWishes(CONTENT.initialWishes || []);
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchWishes();
   }, []);
 
-  // Submit new wish
-  const handleSubmit = async (e) => {
+  // Submit new wish (frontend-only, persists in localStorage)
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!name.trim() || !message.trim()) {
       setError('Please fill in both your name and your wish!');
@@ -49,40 +56,43 @@ export default function WishesWall() {
     setError('');
 
     try {
-      const res = await fetch('/api/wishes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: name.trim(),
-          relation: relation.trim() || 'Friend 🌸',
-          message: message.trim(),
-          avatar,
-          color,
-        }),
+      const newWish = {
+        id: `wish-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        name: name.trim(),
+        relation: relation.trim() || 'Friend 🌸',
+        message: message.trim(),
+        avatar,
+        color,
+        likes: 0,
+        timestamp: new Date().toISOString(),
+      };
+
+      sound.playChime();
+      triggerConfettiBurst(0.5, 0.5);
+
+      setWishes((prev) => {
+        const updated = [newWish, ...prev];
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+        } catch (storageErr) {
+          console.warn('Failed to save wish to localStorage:', storageErr);
+        }
+        return updated;
       });
 
-      const json = await res.json();
-
-      if (json.success && json.data) {
-        sound.playChime();
-        triggerConfettiBurst(0.5, 0.5);
-        setWishes((prev) => [json.data, ...prev]);
-        setShowModal(false);
-        setName('');
-        setRelation('');
-        setMessage('');
-      } else {
-        setError(json.error || 'Failed to submit wish. Please try again!');
-      }
+      setShowModal(false);
+      setName('');
+      setRelation('');
+      setMessage('');
     } catch (err) {
-      setError('Network error, please try again!');
+      setError('Failed to post wish. Please try again!');
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Like a wish
-  const handleLike = async (e, id) => {
+  // Like a wish (persists in localStorage)
+  const handleLike = (e, id) => {
     e.stopPropagation();
     sound.playPop();
     const rect = e.currentTarget.getBoundingClientRect();
@@ -91,16 +101,15 @@ export default function WishesWall() {
       (rect.top + rect.height / 2) / window.innerHeight
     );
 
-    // Optimistic UI update
-    setWishes((prev) =>
-      prev.map((w) => (w.id === id ? { ...w, likes: (w.likes || 0) + 1 } : w))
-    );
-
-    try {
-      await fetch(`/api/wishes/${id}/like`, { method: 'POST' });
-    } catch (err) {
-      console.warn('Failed to register like on server');
-    }
+    setWishes((prev) => {
+      const updated = prev.map((w) => (w.id === id ? { ...w, likes: (w.likes || 0) + 1 } : w));
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      } catch (err) {
+        console.warn('Failed to save like to localStorage:', err);
+      }
+      return updated;
+    });
   };
 
   return (

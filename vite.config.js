@@ -4,13 +4,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3000,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true
-      }
-    }
+    port: 3000
   },
   build: {
     chunkSizeWarningLimit: 1200,
@@ -18,8 +12,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'vendor-three': ['three', '@react-three/fiber', '@react-three/drei'],
-          'vendor-gsap': ['gsap', '@gsap/react'],
-          'vendor-react': ['react', 'react-dom'],
+          'vendor-gsap': ['gsap', '@gsap/react']
         }
       }
     }
