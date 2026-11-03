@@ -1,0 +1,22 @@
+{
+  "name": "vishwa-birthday",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A million-dollar cinematic birthday website for Vishwa",
+  "scripts": {
+    "dev": "concurrently -n \"server,client\" -c \"magenta,cyan\" \"npm run server\" \"npm run client\"",
+    "server": "node server/server.js",
+    "client": "npm --prefix client run dev",
+    "build": "npm --prefix client run build",
+    "start": "node server/server.js",
+    "install:all": "npm install && npm --prefix server install && npm --prefix client install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  }
+}

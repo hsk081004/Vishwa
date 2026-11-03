@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-white: #FFFFFF;
+  --color-cream: #FFF8FA;
+  --color-blush: #FFE4EC;
+  --color-babypink: #FFC2D6;
+  --color-rose: #FF8FB1;
+  --color-hotpink: #FF4D8D;
+  --color-deeprose: #C2185B;
+  --color-text: #4A1525;
+}
+
+html {
+  scroll-behavior: auto; /* Handled smoothly by Lenis */
+}
+
+/* Custom smooth pink scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFF8FA;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #FFC2D6 0%, #FF8FB1 50%, #FF4D8D 100%);
+  border-radius: 9999px;
+  border: 2px solid #FFF8FA;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FF4D8D;
+}
+
+/* Glassmorphism helpers */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 194, 214, 0.5);
+  box-shadow: 0 10px 40px -10px rgba(255, 143, 177, 0.2);
+}
+
+.glass-card-hover {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 45px -10px rgba(255, 77, 141, 0.3);
+  border-color: rgba(255, 77, 141, 0.6);
+}
+
+/* Luxury pink shimmer effect */
+.shimmer-pink {
+  background: linear-gradient(90deg, #FF4D8D 0%, #FFC2D6 50%, #FF4D8D 100%);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Subtle cinematic noise overlay */
+.noise-overlay {
+  background-image: radial-gradient(rgba(255, 143, 177, 0.12) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Wax seal styling */
+.wax-seal {
+  background: radial-gradient(circle at 35% 35%, #FF659F 0%, #C2185B 70%, #880E4F 100%);
+  box-shadow: 0 6px 20px rgba(194, 24, 91, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.5);
+}
+
+/* Prevent text selection during drag gestures */
+.no-select {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
