@@ -231,3 +231,4 @@ export default function RealisticCakeView({ isLit, onBlow }) {
     </div>
   );
 }
+

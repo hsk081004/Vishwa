@@ -21,3 +21,4 @@ export default class CanvasErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
+

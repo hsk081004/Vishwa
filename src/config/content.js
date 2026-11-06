@@ -41,7 +41,7 @@ export const CONTENT = {
     salutation: "Dearest Vishu (aka Expression Queen),",
     paragraphs: [
       "Happy, happy, happiest Birthday! 🎉✨ Honestly, life is so much brighter, louder, and infinitely more chaotic having you as my sister from another mother. Who else would entertain me with 50 distinct dramatic expressions in a 2-minute conversation? 🥺🤗😂",
-      "From fighting over the last slice of pizza to listening to each other's endless life rants, having you in my corner is one of the biggest blessings. You have a heart pure as gold, a smile that can light up any bad day, and an appetite that could probably put competitive eaters to shame. 🍕🍟🍰",
+      "From sharing random food cravings to listening to each other's endless life rants and laughing until our stomachs hurt, having you in my corner is one of the biggest blessings. You have a heart pure as gold, a smile that can light up any bad day, and an appetite that could probably put competitive eaters to shame. 🍜🧁✨",
       "On your special day, I wish you endless happiness, boundless success in everything you chase, zero calories on all your favourite desserts, and all the love this universe has to offer. May you always keep that contagious child-like innocence and infectious joy.",
       "Never change, meri pyaari nautanki! I've always got your back no matter what."
     ],
@@ -475,10 +475,10 @@ export const CONTENT = {
     },
     {
       year: "Chapter 2",
-      title: "The First Food Feud 🍕",
-      subtitle: "The battle for the final slice",
-      desc: "That legendary moment we both eyed the last slice of pizza. Of course, you gave that puppy-dog expression and won!",
-      icon: "🍕"
+      title: "The Ultimate Foodie Partner 🍜",
+      subtitle: "Always down for good food & cravings",
+      desc: "From random late-night food cravings to hunting down the tastiest desserts together. Life with a foodie sister is a non-stop delicious adventure!",
+      icon: "🍜"
     },
     {
       year: "Chapter 3",
